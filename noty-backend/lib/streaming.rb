@@ -9,6 +9,18 @@ def configure_openai_client
   end
 end
 
+def chat_openai(message)
+  client = OpenAI::Client.new
+  response = client.chat(
+    parameters: {
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: message }],
+      temperature: 0.7
+    }
+  )
+  response.dig('choices', 0, 'message', 'content')
+end
+
 def stream_openai_response(message)
   openai = OpenAI::Client.new
   stream = Enumerator.new do |yielder|
@@ -16,7 +28,7 @@ def stream_openai_response(message)
       parameters: {
         model: 'gpt-4o',
         messages: [
-          { role: 'assistant', content: 'Provide concise answer, within 100 words.'},
+          { role: 'assistant', content: 'Provide concise answer, within 100 words.' },
           { role: 'user', content: message }
         ],
         temperature: 0.7,
@@ -27,7 +39,6 @@ def stream_openai_response(message)
       }
     )
   end
-
   stream
 end
 

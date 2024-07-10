@@ -5,9 +5,10 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
-      '/stream': {
+      '/api': {
         target: 'http://localhost:9292',
         changeOrigin: true,
+        pathRewrite: { '^/api': '' },
         secure: false,
         ws: true
       }
