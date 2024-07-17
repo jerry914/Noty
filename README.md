@@ -1,7 +1,7 @@
 # Noty
 
 ## Overview
-Noty is a note-taking application using Ruby Roda and Vue.js (Vite). It enables users to create notes with titles, content, and prompts, which are private to each owner. Notes are organized into collections with names and prompts. Users can log in via Google, automatically creating an account with their Google name, email, and avatar.
+Noty is a note-taking application using Ruby Roda and Vue.js (Vite). It enables users to create notes with titles, content, and prompts, which are private to each owner. Notes are organized into collections with names and prompts. Accounts can log in via Google, automatically creating an account with their Google name, email, and avatar.
 
 ## Requirements
 - Ruby
@@ -10,8 +10,28 @@ Noty is a note-taking application using Ruby Roda and Vue.js (Vite). It enables 
 
 ## Installation
 1. Clone the repository.
-2. Run `bundle install` to install the required Ruby gems.
-3. Use $`export OPENAI_API_KEY=your_api_key_here` to set the key in enviroment. And consider create a .env file in the root directory and add your OpenAI API key as `OPENAI_API_KEY=your_api_key_here`.
+3. Run `bundle install` to install the required Ruby gems.
+4. Create `.env` in noty-backend:
+```
+# .env
+DATABASE_URL_DEV=sqlite://db/store/development.sqlite3
+DATABASE_URL_TEST=sqlite://db/store/test.sqlite3
+DATABASE_URL_PROD=postgres://user:password@localhost/noty_production
+
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:9292/auth/google/callback
+SESSION_SECRET=<ruby -rsecurerandom -e 'puts SecureRandom.hex(64)'>
+ENCRYPTION_KEY=<openssl rand -base64 32>
+
+```
+
+5. Run migrations:
+```
+RACK_ENV=development rake db:migrate
+RACK_ENV=test rake db:migrate
+RACK_ENV=production rake db:migrate
+```
 
 
 ### Backend (Ruby Roda)
@@ -72,7 +92,7 @@ noty-backend/
 - **models/**: Contains the business logic and database interaction.
     - `note.rb`: Defines the Note model.
     - `collection.rb`: Defines the Collection model.
-    - `user.rb`: Defines the User model.
+    - `account.rb`: Defines the Account model.
 - **services/**: Encapsulates complex business logic.
     - `authentication_service.rb`: Handles authentication logic.
     - `authorization_service.rb`: Handles authorization logic.

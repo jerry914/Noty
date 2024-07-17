@@ -2,26 +2,25 @@
 
 source 'https://rubygems.org'
 
+gem 'roda'
+gem 'sequel'
+gem 'sqlite3'
+gem 'json'
+gem 'rack'
+gem 'rack-protection'
+gem 'oauth2'
 gem 'dotenv'
 gem 'puma'
-gem 'roda'
+gem 'rack-cors'
 gem 'ruby-openai'
-gem 'rake', '~>13.0'
-gem 'sequel', '~>5.0'
-gem 'dry-validation', '~>1.10'
-gem 'rack-ssl-enforcer'
-gem 'rbnacl'
-gem 'rack-ssl-enforcer'
+gem 'openssl'
+
+group :development, :test do
+  gem 'rspec'
+  gem 'pry'
+  gem 'rubocop'
+end
 
 group :production do
   gem 'pg', '~>1.0'
-end
-
-group :development, :test do
-  gem 'pry'
-  gem 'sqlite3', '~> 1.0'
-end
-
-group :development do
-  gem 'rubocop'
 end

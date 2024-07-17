@@ -156,7 +156,9 @@ export default {
   background-color: white;
   padding: 2rem;
   border-radius: 8px;
-  max-width: 500px;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
   width: 80%;
   position: relative;
 }

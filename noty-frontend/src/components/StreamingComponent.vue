@@ -30,7 +30,7 @@ export default {
       if (this.isResponsing) return;
       this.isResponsing = true;
 
-      const response = await fetch('/api/stream', {
+      const response = await fetch('/api/chat/stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

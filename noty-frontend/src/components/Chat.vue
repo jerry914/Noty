@@ -57,7 +57,7 @@ export default {
       if (this.messages.length > 0) {
         const message = this.messages[0];
         try {
-          const response = await fetch('/api/summarize', {
+          const response = await fetch('/api/chat/summarize', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -68,8 +68,9 @@ export default {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
-          
+
           const data = await response.text();
+
           this.$emit('new-card', { question: data, answer: this.messages.join('') });
           this.messages = [];
         } catch (error) {
