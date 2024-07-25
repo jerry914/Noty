@@ -44,7 +44,7 @@ export default {
 
           if (response.ok) {
             this.storeLoginData(data);
-            this.$router.push("/note")
+            this.$router.push("/")
           } else {
             console.error('Login failed', data);
           }

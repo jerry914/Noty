@@ -5,7 +5,7 @@
 export default {
   name: 'StreamingComponent',
   props: {
-    question: {
+    title: {
       type: String,
       required: true,
     },
@@ -16,17 +16,17 @@ export default {
     };
   },
   watch: {
-    question: {
+    title: {
       immediate: true,
-      handler(newQuestion) {
-        if (newQuestion) {
-          this.sendMessage(newQuestion);
+      handler(newTitle) {
+        if (newTitle) {
+          this.sendMessage(newTitle);
         }
       },
     },
   },
   methods: {
-    async sendMessage(question) {
+    async sendMessage(title) {
       if (this.isResponsing) return;
       this.isResponsing = true;
 
@@ -35,26 +35,26 @@ export default {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: question }),
+        body: JSON.stringify({ message: title }),
       });
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let done = false;
-      let answer = '';
+      let content = '';
 
       while (!done) {
         const { value, done: readerDone } = await reader.read();
         done = readerDone;
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
-          answer += chunk;
+          content += chunk;
           this.$emit('response-chunk', chunk); // Emit each chunk
         }
       }
 
       this.isResponsing = false;
-      this.$emit('response-complete', answer); // Emit the complete answer
+      this.$emit('response-complete', content); // Emit the complete content
     },
   },
 };

@@ -1,19 +1,19 @@
 <template>
     <div class="card-container">
         <div class="card" @click="openCard">
-            <div class="question">
-            {{ question }}
+            <div class="note-title">
+            {{ title }}
             </div>
-            <div class="answer" v-html="answer"></div>
+            <div class="note-content" v-html="content"></div>
             <button class="archive-button" @click.stop="archiveCard"><font-awesome-icon :icon="['fas', 'box-archive']" /></button>
         </div>
         <div v-if="isOpen" class="modal" @click.self="closeCard">
             <div class="modal-content">
-                <h2>{{ question }}</h2>
+                <h2>{{ title }}</h2>
                 <button class="archive-button" @click.stop="archiveCard">
                 <font-awesome-icon :icon="['fas', 'box-archive']" />
                 </button>
-                <TipTapEditor v-model="editedAnswer" />
+                <TipTapEditor v-model="editedContent" />
                 <div class="ai-response-text">
                     <span v-for="message in messages" :key="message">
                         {{ message }}
@@ -26,7 +26,7 @@
                 </div>
             </div>
         </div>
-        <StreamingComponent v-if="currentQuestion" :question="currentQuestion" @response-chunk="handleChunk" @response-complete="handleComplete" />
+        <StreamingComponent v-if="currentTitle" :title="currentTitle" @response-chunk="handleChunk" @response-complete="handleComplete" />
     </div>
 </template>
 
@@ -40,11 +40,11 @@ export default {
     StreamingComponent,
   },
   props: {
-    question: {
+    title: {
       type: String,
       required: true
     },
-    answer: {
+    content: {
       type: String,
       required: true
     }
@@ -52,8 +52,8 @@ export default {
   data() {
     return {
       isOpen: false,
-      editedAnswer: this.answer,
-      currentQuestion: '',
+      editedContent: this.content,
+      currentTitle: '',
       isResponsing: false,
       messages: []
     };
@@ -61,21 +61,21 @@ export default {
   methods: {
     sendMessage() {
       if (this.isResponsing) return;
-      this.currentQuestion = this.editedAnswer;
+      this.currentTitle = this.editedContent;
       this.isResponsing = true;
       
     },
     handleChunk(chunk) {
       this.messages.push(chunk);
     },
-    handleComplete(answer) {
+    handleComplete(content) {
       this.isResponsing = false;
-      this.editedAnswer += this.messages.join('');
+      this.editedContent += this.messages.join('');
       this.messages = [];
     },
     openCard() {
       this.isOpen = true;
-      this.editedAnswer = this.answer;
+      this.editedContent = this.content;
     },
     closeCard() {
       this.isOpen = false;
@@ -84,7 +84,7 @@ export default {
       this.$emit('archive');
     },
     saveEdit() {
-      this.$emit('update-answer', this.editedAnswer);
+      this.$emit('update-content', this.editedContent);
       this.closeCard();
     }
   }
@@ -128,12 +128,12 @@ export default {
   background-color: #ff1c1c;
 }
 
-.question,
-.answer {
+.note-title,
+.note-content {
   margin-bottom: 0.5rem;
 }
 
-.question {
+.note-title {
   font-size: 1.1rem;
   font-weight: 700;
   width: calc( 100% - 30px );

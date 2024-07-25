@@ -1,6 +1,8 @@
 # controllers/sessions_controller.rb
 
 class SessionsController < ApplicationController
+  plugin :cookies
+
   route do |r|
     r.get 'google' do
       r.redirect GoogleClient.auth_code.authorize_url(redirect_uri: GOOGLE_REDIRECT_URI, scope: 'email profile', access_type: 'offline')
@@ -14,7 +16,18 @@ class SessionsController < ApplicationController
         acc.avatar = user_info['picture']
       end
 
-      session['account_id'] = account.id
+      collections = Collection.first(account_id: account.id)
+      CollectionService.new(account).create_default unless collections
+
+      # Set the session cookie with appropriate domain
+      response.set_cookie('roda_session', {
+        value: account.id,
+        path: '/',
+        domain: request.host == 'localhost' ? 'localhost' : API_DOMAIN_URL,
+        same_site: :lax,
+        secure: request.host != 'localhost', # Use secure cookies in production
+        httponly: true
+      })
 
       { message: 'Login successful', account: AccountSerializer.new(account).serialize }
     end

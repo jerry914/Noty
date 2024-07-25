@@ -1,4 +1,5 @@
 # controllers/collections_controller.rb
+
 class CollectionsController < ApplicationController
   route do |r|
     r.is do
@@ -26,6 +27,15 @@ class CollectionsController < ApplicationController
 
     r.on Integer do |id|
       collection = Collection[account_id: current_account.id, id: id]
+
+      r.on 'notes' do
+        r.get do
+          return if authenticate!
+  
+          notes = Note.where(account_id: current_account.id, status: 'unarchived', collection_id: collection.id).all
+          notes.map { |note| NoteSerializer.new(note).serialize }
+        end
+      end
 
       r.is do
         r.get do

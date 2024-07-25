@@ -305,7 +305,6 @@ GET https://api.notyapp.com/collections
 **Endpoint:**
 
 ```bash
-bashCopy code
 PUT /collections/:id
 
 ```
@@ -316,7 +315,6 @@ Updates a collection for the authenticated user.
 **Request Headers:**
 
 ```bash
-bashCopy code
 Content-Type: application/json
 
 ```

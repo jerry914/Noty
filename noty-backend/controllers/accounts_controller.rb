@@ -15,7 +15,30 @@ class AccountsController < ApplicationController
       r.get do
         return if authenticate!
 
-        Account.where(id: current_account.id).all.map { |account| AccountSerializer.new(account).serialize }
+        account = Account.first(id: current_account.id)
+        AccountSerializer.new(account).serialize
+      end
+
+      r.put do
+        return if authenticate!
+
+        if current_account
+          data = r.params
+
+          if data['llms_secret']
+            data['llms_secret'] = EncryptionService.encrypt(data['llms_secret'])
+          end
+
+          if current_account.update(data)
+            { message: 'Account updated successfully', account: AccountSerializer.new(current_account).serialize }
+          else
+            response.status = 422
+            { error: 'Invalid account data' }
+          end
+        else
+          response.status = 404
+          { error: 'Account not found' }
+        end
       end
     end
 

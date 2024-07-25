@@ -9,7 +9,7 @@
     <div class="messages">
       <span v-dompurify-html="this.messages.join('')"></span>
     </div>
-    <StreamingComponent v-if="currentQuestion" :question="currentQuestion" @response-chunk="handleChunk" @response-complete="handleComplete" />
+    <StreamingComponent v-if="currentQuestion" :title="currentQuestion" @response-chunk="handleChunk" @response-complete="handleComplete" />
   </div>
 </template>
 
@@ -40,7 +40,7 @@ export default {
     handleChunk(chunk) {
       this.messages.push(chunk);
     },
-    handleComplete(answer) {
+    handleComplete(content) {
       this.messages.push('<br>');
       this.isResponsing = false;
       this.currentQuestion = '';
@@ -71,7 +71,7 @@ export default {
 
           const data = await response.text();
 
-          this.$emit('new-card', { question: data, answer: this.messages.join('') });
+          this.$emit('new-card', { title: data, content: this.messages.join('') });
           this.messages = [];
         } catch (error) {
           console.error('Error:', error);

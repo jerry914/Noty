@@ -1,6 +1,7 @@
 <template>
+  <Collections></Collections>
+  <Chat @new-card="addCard" />
   <div class="card-view-container">
-    <Chat @new-card="addCard" />
     <Cards :cards="cards" @archive-card="archiveCard" @update-card="updateCard" />
   </div>
 </template>
@@ -8,18 +9,20 @@
 <script>
 import Chat from '../components/Chat.vue';
 import Cards from '../components/Cards.vue';
+import Collections from '../components/CollectionList.vue'
 
 export default {
   components: {
     Chat,
-    Cards
+    Cards,
+    Collections
   },
   data() {
     return {
       cards: [
         {
-            question: "This is an example",
-            answer: `
+            title: "This is an example",
+            content: `
             <p>
             Markdown shortcuts make it easy to format the text while typing.
             </p>
@@ -56,23 +59,107 @@ else
       ]
     };
   },
+  mounted() {
+    this.fetchCards();
+  },
+  watch: {
+    '$route.params.id': function(id) {
+      this.fetchCards();
+    }
+  },
   methods: {
-    addCard(card) {
-      this.cards.push(card);
+    async fetchCards() {
+      try {
+        let noteUrl = '/api/notes/unarchived'
+        if (this.$route.params.id) {
+          noteUrl = '/api/collections/'+this.$route.params.id+'/notes'
+        }
+        const response = await fetch(noteUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        this.cards = data;
+      } catch (error) {
+        console.error('Error fetching cards:', error);
+      }
     },
-    archiveCard(index) {
-      this.cards.splice(index, 1);
+    async addCard(card) {
+      try {
+        const response = await fetch('/api/notes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(card)
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const newCard = await response.json();
+        this.cards.push(newCard.note);
+      } catch (error) {
+        console.error('Error adding card:', error);
+      }
     },
-    updateCard(index, updatedAnswer) {
-      this.cards[index].answer = updatedAnswer
+    async archiveCard(index) {
+      try {
+        const card = this.cards[index];
+        const response = await fetch(`/api/notes/${card.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status: 'archieved' })
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const updatedCard = await response.json();
+        this.cards[index].content = updatedCard.note.content;
+      } catch (error) {
+        console.error('Error updating card:', error);
+      }
     },
+    async deleteCard(index) {
+      try {
+        const card = this.cards[index];
+        const response = await fetch(`/api/notes/${card.id}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        this.cards.splice(index, 1);
+      } catch (error) {
+        console.error('Error archiving card:', error);
+      }
+    },
+    async updateCard(index, updatedContent) {
+      try {
+        const card = this.cards[index];
+        const response = await fetch(`/api/notes/${card.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ content: updatedContent })
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const updatedCard = await response.json();
+        this.cards[index].content = updatedCard.note.content;
+      } catch (error) {
+        console.error('Error updating card:', error);
+      }
+    }
   }
 }
 </script>
 
 <style scoped>
 .card-view-container {
-    max-width: 80vw;
     margin: auto;
     columns: 4 300px;
     column-gap: 1rem;

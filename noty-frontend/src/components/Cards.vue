@@ -3,10 +3,10 @@
     <Card
       v-for="(card, index) in cards"
       :key="index"
-      :question="card.question"
-      :answer="card.answer"
+      :title="card.title"
+      :content="card.content"
       @archive="archiveCard(index)"
-      @update-answer="updateCard(index, $event)"
+      @update-content="updateCard(index, $event)"
     />
   </div>
 </template>
@@ -28,8 +28,8 @@ export default {
     archiveCard(index) {
       this.$emit('archive-card', index)
     },
-    updateCard(index, updatedAnswer) {
-      this.$emit('update-card', index, updatedAnswer)
+    updateCard(index, updatedContent) {
+      this.$emit('update-card', index, updatedContent)
     },
   },
 }
