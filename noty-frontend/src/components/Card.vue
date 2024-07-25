@@ -20,10 +20,6 @@
                     </span>
                 </div>
                 <button @click="sendMessage" class="ask-ai"><font-awesome-icon :icon="['fas', 'paper-plane']" /> Ask AI</button>
-                <div style="float: right;">
-                    <button @click="closeCard" class="close">Cancel</button>
-                    <button @click="saveEdit" class="save">Save</button>
-                </div>
             </div>
         </div>
         <StreamingComponent v-if="currentTitle" :title="currentTitle" @response-chunk="handleChunk" @response-complete="handleComplete" />
@@ -52,11 +48,17 @@ export default {
   data() {
     return {
       isOpen: false,
+      isEdited: false,
       editedContent: this.content,
       currentTitle: '',
       isResponsing: false,
       messages: []
     };
+  },
+  watch: {
+    'editedContent': function() {
+      this.isEdited = true;
+    }
   },
   methods: {
     sendMessage() {
@@ -78,6 +80,7 @@ export default {
       this.editedContent = this.content;
     },
     closeCard() {
+      if (this.isEdited) this.saveEdit();
       this.isOpen = false;
     },
     archiveCard() {
@@ -85,7 +88,6 @@ export default {
     },
     saveEdit() {
       this.$emit('update-content', this.editedContent);
-      this.closeCard();
     }
   }
 }
